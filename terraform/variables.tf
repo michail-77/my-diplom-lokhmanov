@@ -4,17 +4,17 @@
 # }
 
 variable "service_account_key_file" {
-  type  = string
+  type        = string
   description = "Yandex.Cloud service account key file"
 }
 
 variable "yc_auth_key_file" {
-  type    = string
+  type        = string
   description = "Yandex.Cloud auth key file"
 }
 
 variable "service_account_id" {
-  type = string
+  type        = string
   description = "Yandex.Cloud service_account_id"
 }
 
@@ -51,59 +51,52 @@ variable "vpc_name" {
 
 variable "public_image" {
   type        = string
-  default     = "fd8vljd295nqdaoogf3g"
+  default     = "fd852pbtueis1q0pbt4o" 
   description = "Yandex.Compute image ID"
 }
-
-
-# variable "ubuntu-2004-lts" {
-#   default = "fd852pbtueis1q0pbt4o"
-# }
-
-
 
 variable "public_resources" {
   type = map(number)
   default = {
-    cores          = 4
-    memory         = 4
-    core_fraction  = 20
-    size           = 60
- }
+    cores         = 4
+    memory        = 4
+    core_fraction = 20
+    size          = 40
+  }
 }
 
 variable "ssh_public_key_path" {
   type    = string
-  default = "~/.ssh/id_rsa.pub"  # Укажите здесь путь к вашему открытому ключу SSH
+  default = "~/.ssh/id_rsa.pub" # Укажите здесь путь к вашему открытому ключу SSH
 }
 
 variable "public_resources_node" {
   type = map(number)
   default = {
-    cores          = 2
-    memory         = 2
-    core_fraction  = 20
-    size           = 40
- }
+    cores         = 2
+    memory        = 2
+    core_fraction = 20
+    size          = 20
+  }
 }
 
 
-variable "teamcity_resources_server" {
-  type = map(number)
-  default = {
-    cores          = 4
-    memory         = 4
-    core_fraction  = 100
-    size           = 60
- }
-}
+# variable "teamcity_resources_server" {
+#   type = map(number)
+#   default = {
+#     cores         = 4
+#     memory        = 4
+#     core_fraction = 100
+#     size          = 60
+#   }
+# }
 
-variable "teamcity_resources_agent" {
-  type = map(number)
-  default = {
-    cores          = 2
-    memory         = 2
-    core_fraction  = 20
-    size           = 60
- }
-}
+# variable "teamcity_resources_agent" {
+#   type = map(number)
+#   default = {
+#     cores         = 2
+#     memory        = 2
+#     core_fraction = 20
+#     size          = 60
+#   }
+# }

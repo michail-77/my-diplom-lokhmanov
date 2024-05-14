@@ -21,18 +21,7 @@ all:
       access_ip: ${yandex_compute_instance.node2.network_interface.0.ip_address}
       ansible_user: ubuntu
       ansible_ssh_common_args: "-i ~/.ssh/id_rsa"
-    teamcity-server:
-      ansible_host: ${yandex_compute_instance.teamcity-server.network_interface.0.nat_ip_address}
-      ip: ${yandex_compute_instance.teamcity-server.network_interface.0.ip_address}
-      access_ip: ${yandex_compute_instance.teamcity-server.network_interface.0.ip_address}
-      ansible_user: ubuntu
-      ansible_ssh_common_args: "-i ~/.ssh/id_rsa"
-    teamcity-agent:
-      ansible_host: ${yandex_compute_instance.teamcity-agent.network_interface.0.nat_ip_address}
-      ip: ${yandex_compute_instance.teamcity-agent.network_interface.0.ip_address}
-      access_ip: ${yandex_compute_instance.teamcity-agent.network_interface.0.ip_address}
-      ansible_user: ubuntu
-      ansible_ssh_common_args: "-i ~/.ssh/id_rsa"
+
   children:
     kube_control_plane:
       hosts:
@@ -52,3 +41,18 @@ all:
       hosts: {}
 EOF
 }
+
+
+
+# teamcity-server:
+#   ansible_host: ${yandex_compute_instance.teamcity-server.network_interface.0.nat_ip_address}
+#   ip: ${yandex_compute_instance.teamcity-server.network_interface.0.ip_address}
+#   access_ip: ${yandex_compute_instance.teamcity-server.network_interface.0.ip_address}
+#   ansible_user: ubuntu
+#   ansible_ssh_common_args: "-i ~/.ssh/id_rsa"
+# teamcity-agent:
+#   ansible_host: ${yandex_compute_instance.teamcity-agent.network_interface.0.nat_ip_address}
+#   ip: ${yandex_compute_instance.teamcity-agent.network_interface.0.ip_address}
+#   access_ip: ${yandex_compute_instance.teamcity-agent.network_interface.0.ip_address}
+#   ansible_user: ubuntu
+#   ansible_ssh_common_args: "-i ~/.ssh/id_rsa"
