@@ -44,7 +44,7 @@ resource "yandex_kms_symmetric_key" "key-a" {
 
 # # Создаем бэкэнд хранилище (с шифрованием данных)
 # resource "yandex_storage_bucket" "backend-encrypted" {
-  
+
 #   bucket     = "yc-backend"
 
 #   access_key = yandex_iam_service_account_static_access_key.bucket-static_access_key.access_key
