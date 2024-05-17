@@ -1,0 +1,41 @@
+# Предположим, что вы уже имеете ресурс для сети VPC с именем "develop"
+# и подсети в каждой зоне, как описано в вашей конфигурации
+
+# Создание кластера Kubernetes
+resource "yandex_kubernetes_cluster" "cluster" {
+  name               = "my-cluster"
+  network_id         = yandex_vpc_network.develop.id
+  subnet_ids         = [
+    yandex_vpc_subnet.subnet["central1-a"].id,
+    yandex_vpc_subnet.subnet["central1-b"].id,
+    yandex_vpc_subnet.subnet["central1-d"].id,
+  ]
+  location           = "ru-central1"
+  version            = "1.21"
+  service_account_id = var.service_account_id
+
+  master {
+    zonal_master = false
+  }
+
+  node_pool {
+    name            = "default-pool"
+    zone            = var.default_zone_a
+    machine_type    = "standard-v2-2"
+    initial_node_count = 1
+  }
+
+  node_pool {
+    name            = "pool-2"
+    zone            = var.default_zone_b
+    machine_type    = "standard-v2-2"
+    initial_node_count = 1
+  }
+
+  node_pool {
+    name            = "pool-3"
+    zone            = var.default_zone_d
+    machine_type    = "standard-v2-2"
+    initial_node_count = 1
+  }
+}
