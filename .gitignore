@@ -15,3 +15,5 @@ credentials*
 *.env
 
 terraform_2
+
+02_kubernetes*
