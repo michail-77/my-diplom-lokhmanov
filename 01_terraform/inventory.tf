@@ -1,5 +1,5 @@
 resource "local_file" "ansible_inventory" {
-  filename = "/mnt/d/Netology/Diplom/kubespray/inventory/mycluster/hosts.yaml"
+  filename = "/mnt/d/Netology/Diplom/kubespray/inventory/mycluster/hosts.yml"
   content  = <<EOF
 all:
   hosts:
