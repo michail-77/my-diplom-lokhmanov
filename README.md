@@ -1,4 +1,17 @@
 # Дипломный практикум в Yandex.Cloud
+- [Дипломный практикум в Yandex.Cloud](#дипломный-практикум-в-yandexcloud)
+  - [Цели:](#цели)
+  - [Этапы выполнения:](#этапы-выполнения)
+    - [Создание облачной инфраструктуры](#создание-облачной-инфраструктуры)
+    - [Решение:](#решение)
+    - [Создание Kubernetes кластера](#создание-kubernetes-кластера)
+    - [Решение:](#решение-1)
+    - [Создание тестового приложения](#создание-тестового-приложения)
+    - [Подготовка cистемы мониторинга и деплой приложения](#подготовка-cистемы-мониторинга-и-деплой-приложения)
+    - [Установка и настройка CI/CD](#установка-и-настройка-cicd)
+  - [Что необходимо для сдачи задания?](#что-необходимо-для-сдачи-задания)
+
+**Перед началом работы над дипломным заданием изучите [Инструкция по экономии облачных ресурсов](https://github.com/netology-code/devops-materials/blob/master/cloudwork.MD).**
 
 ---
 ## Цели:
@@ -18,6 +31,12 @@
 
 Для начала необходимо подготовить облачную инфраструктуру в ЯО при помощи [Terraform](https://www.terraform.io/).
 
+Особенности выполнения:
+
+- Бюджет купона ограничен, что следует иметь в виду при проектировании инфраструктуры и использовании ресурсов;
+Для облачного k8s используйте региональный мастер(неотказоустойчивый). Для self-hosted k8s минимизируйте ресурсы ВМ и долю ЦПУ. В обоих вариантах используйте прерываемые ВМ для worker nodes.
+- Следует использовать версию [Terraform](https://www.terraform.io/) не старше 1.5.x .
+
 Предварительная подготовка к установке и запуску Kubernetes кластера.
 
 1. Создайте сервисный аккаунт, который будет в дальнейшем использоваться Terraform для работы с инфраструктурой с необходимыми и достаточными правами. Не стоит использовать права суперпользователя
@@ -33,35 +52,175 @@
 1. Terraform сконфигурирован и создание инфраструктуры посредством Terraform возможно без дополнительных ручных действий.
 2. Полученная конфигурация инфраструктуры является предварительной, поэтому в ходе дальнейшего выполнения задания возможны изменения.
 
---- 
+### Решение:  
+1. Создаем сервисный аккаунт в [yandex cloud] (https://yandex.cloud/ru/docs/iam/operations/sa/create) согласно инструкции и назначаем ему роли.
+```
+   $ yc iam service-account list
++----------------------+-----------+
+|          ID          |   NAME    |
++----------------------+-----------+
+| ajec47hqj2hk2peqj980 | admin     |
+| ajeetedg476jfgrmn6mn | editor    |
+| ajeupl64gvqlbfab689f | bucket-sa |
++----------------------+-----------+
+```
+   ![6](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/6_service%20account.png)
+   Создаем service-accoun-key и authorized_key.json
+```
+$ yc config list
+service-account-key:
+  id: ajeh5j1gqvn0qhd459q5
+  service_account_id: ajeetedg476jfgrmn6mn
+  created_at: "2024-05-02T15:33:45.556389551Z"
+  key_algorithm: RSA_2048
+  public_key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAA...
+    -----END PUBLIC KEY-----
+  private_key: |
+    PLEASE DO NOT REMOVE THIS LINE! Yandex.Cloud SA Key ID <ajeh5j1...qhd459q5>
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQ...
+    -----END PRIVATE KEY-----
+cloud-id: b1ghns2saijtpp8com7i
+folder-id: b1gb5mplcv6bu0g0eolj
+compute-default-zone: ru-central1
 
-## Решение
+$ yc config set service-account-key authorized_key.json
 
-### Конфигурация [Terraform](https://github.com/Firewal7/netology-diplom/tree/main/terraform) 
+```
+  
+2. Устанавливаем и настраиваем [terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart)  
+   Подготавливаем конфигурацию [Terraform](https://github.com/michail-77/my-diplom-lokhmanov/tree/main/01_terraform)  
+   Перед запуском проверим конфигурацию командой terraform validate
+   ```
+user@DESKTOP-RAJIAFA:/mnt/d/Netology/Diplom/my-diplom-lokhmanov/01_terraform$ terraform validate
+Success! The configuration is valid.
+   
+user@DESKTOP-RAJIAFA:/mnt/d/Netology/Diplom/my-diplom-lokhmanov/01_terraform$ terraform plan
+data.yandex_compute_image.public-ubuntu: Reading...
+yandex_kms_symmetric_key.key-a: Refreshing state... [id=abj49aohkpme1rnhtuan]
+yandex_iam_service_account.bucket-sa: Refreshing state... [id=ajes4f4lk8olvqslma45]
+yandex_vpc_network.develop: Refreshing state... [id=enp45e57ul75o0r4503i]
+data.yandex_compute_image.public-ubuntu: Read complete after 0s [id=fd852pbtueis1q0pbt4o]
+yandex_iam_service_account_static_access_key.sa-static-key: Refreshing state... [id=ajegj8vovp501rkjvbh8]
+yandex_vpc_subnet.subnet["central1-a"]: Refreshing state... [id=e9b6ajbl7jtje54vlt9j]
+yandex_vpc_subnet.subnet["central1-b"]: Refreshing state... [id=e2lj6jl8ldcmh7067ktt]
+yandex_vpc_subnet.subnet["central1-d"]: Refreshing state... [id=fl8satavjhnb5kjj2me9]
+yandex_compute_instance.node1: Refreshing state... [id=epd20nou1lk7t81r073n]
+yandex_compute_instance.node2: Refreshing state... [id=fv4gg7pudf3dnq5laui2]
+yandex_compute_instance.master: Refreshing state... [id=fhms3m9vp9h4jekj0cih]
+local_file.ansible_inventory: Refreshing state... [id=cd00f3fb7a498abd77cd401225a1ed65752367b2]
+Note: Objects have changed outside of Terraform
+Terraform detected the following changes made outside of Terraform since the last "terraform apply" which may have  
+affected this plan:
+  # yandex_compute_instance.master has changed
+  ~ resource "yandex_compute_instance" "master" {
+        id                        = "fhms3m9vp9h4jekj0cih"
+        name                      = "master"
+        # (11 unchanged attributes hidden)
+      ~ network_interface {
+          - nat_ip_address     = "51.250.2.231" -> null
+            # (9 unchanged attributes hidden)
+        }
+        # (5 unchanged blocks hidden)
+    }
+  # yandex_compute_instance.node1 has changed
+  ~ resource "yandex_compute_instance" "node1" {
+        id                        = "epd20nou1lk7t81r073n"
+        name                      = "node1"
+        # (11 unchanged attributes hidden)
 
-1. Запускаем команду terraform apply.
+      ~ network_interface {
+          - nat_ip_address     = "158.160.92.91" -> null
+            # (9 unchanged attributes hidden)
+        }
+        # (5 unchanged blocks hidden)
+    }
+  # yandex_compute_instance.node2 has changed
+  ~ resource "yandex_compute_instance" "node2" {
+        id                        = "fv4gg7pudf3dnq5laui2"
+        name                      = "node2"
+        # (11 unchanged attributes hidden)
+      ~ network_interface {
+          - nat_ip_address     = "158.160.167.27" -> null
+            # (9 unchanged attributes hidden)
+        }
+        # (5 unchanged blocks hidden)
+    }
+Unless you have made equivalent changes to your configuration, or ignored the relevant attributes using
+ignore_changes, the following plan may include actions to undo or respond to these changes.
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with 
+the following symbols:
+-/+ destroy and then create replacement
+Terraform will perform the following actions:
+  # local_file.ansible_inventory must be replaced
+-/+ resource "local_file" "ansible_inventory" {
+      ~ content              = <<-EOT # forces replacement
+            all:
+              hosts:
+                master:
+          -       ansible_host: 51.250.2.231
+          +       ansible_host:
+                  ip: 10.0.1.10
+                  access_ip: 10.0.1.10
+                  ansible_user: ubuntu
+                  ansible_ssh_common_args: "-i /root/.ssh/id_rsa"
+                node1:
+          -       ansible_host: 158.160.92.91
+          +       ansible_host:
+                  ip: 10.0.2.11
+                  access_ip: 10.0.2.11
+                  ansible_user: ubuntu
+                  ansible_ssh_common_args: "-i /root/.ssh/id_rsa"
+                node2:
+          -       ansible_host: 158.160.167.27
+          +       ansible_host:
+                  ip: 10.0.3.12
+                  access_ip: 10.0.3.12
+                  ansible_user: ubuntu
+                  ansible_ssh_common_args: "-i /root/.ssh/id_rsa"
+              children:
+                kube_control_plane:
+                  hosts:
+                    master:
+                kube_node:
+                  hosts:
+                    node1:
+                    node2:
+                etcd:
+                  hosts:
+                    master:
+                k8s_cluster:
+                  children:
+                    kube_control_plane:
+                    kube_node:
+                calico_rr:
+                  hosts: {}
+        EOT
+      ~ content_base64sha256 = "fYhH4Lfa/9SPSHGF1EIKp8Lix2UVz6CTA8vzeNgg5dg=" -> (known after apply)
+      ~ content_base64sha512 = "+mTVPBhS+f+lEuYiv5LleM2n4siAZqCn7DvJm6ZVDmKaIWwgGUaCJ1nVH27SUzJDU5+nL7hBDEDxz/jqHJnk8w==" -> (known after apply)
+      ~ content_md5          = "26924e1d9ed94137f309bfd82da86c71" -> (known after apply)
+      ~ content_sha1         = "cd00f3fb7a498abd77cd401225a1ed65752367b2" -> (known after apply)
+      ~ content_sha256       = "7d8847e0b7daffd48f487185d4420aa7c2e2c76515cfa09303cbf378d820e5d8" -> (known after apply)
+      ~ content_sha512       = "fa64d53c1852f9ffa512e622bf92e578cda7e2c88066a0a7ec3bc99ba6550e629a216c201946822759d51f6ed2533243539fa72fb8410c40f1cff8ea1c99e4f3" -> (known after apply)
+      ~ id                   = "cd00f3fb7a498abd77cd401225a1ed65752367b2" -> (known after apply)
+        # (3 unchanged attributes hidden)
+    }
+Plan: 1 to add, 0 to change, 1 to destroy.
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly these actions  
+if you run "terraform apply" now.
+   ```
+3. Выполняем команду terraform apply и у нас без дополнительных ручных действий разворачивается инфраструктура в яндекс облаке.
+   ![1](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/1_вирт_машины.png)  
+   ![2](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/2_сети.png)  
+   ![3](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/3_подсети_yc.png)  
+   ![4](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/4_сервис_аккаунт.png)  
+   ![5](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/5_бакет.png)  
 
-Создаётся вся облачная инфраструктура:
-
-Выполним команду terraform init:
-
-![Ссылка 1](https://github.com/Firewal7/netology-diplom/blob/main/images/1.init.jpg)
-
-#### Выполним команду terraform apply:
-
-![Ссылка 2](https://github.com/Firewal7/netology-diplom/blob/main/images/2.apply.jpg)
-
-![Ссылка 3](https://github.com/Firewal7/netology-diplom/blob/main/images/3.cloud.jpg)
-
-![Ссылка 4](https://github.com/Firewal7/netology-diplom/blob/main/images/4.vm.jpg)
-
-![Ссылка 5](https://github.com/Firewal7/netology-diplom/blob/main/images/5.bucket.jpg)
-
-### Загружаем файл состояния tdstate, после развёртывания всей инфраструктуры:
-
-![Ссылка 6](https://github.com/Firewal7/netology-diplom/blob/main/images/6.tdstate.jpg)
-
-
+---
 ### Создание Kubernetes кластера
 
 На этом этапе необходимо создать [Kubernetes](https://kubernetes.io/ru/docs/concepts/overview/what-is-kubernetes/) кластер на базе предварительно созданной инфраструктуры.   Требуется обеспечить доступ к ресурсам из Интернета.
@@ -72,7 +231,7 @@
    а. При помощи Terraform подготовить как минимум 3 виртуальных машины Compute Cloud для создания Kubernetes-кластера. Тип виртуальной машины следует выбрать самостоятельно с учётом требовании к производительности и стоимости. Если в дальнейшем поймете, что необходимо сменить тип инстанса, используйте Terraform для внесения изменений.  
    б. Подготовить [ansible](https://www.ansible.com/) конфигурации, можно воспользоваться, например [Kubespray](https://kubernetes.io/docs/setup/production-environment/tools/kubespray/)  
    в. Задеплоить Kubernetes на подготовленные ранее инстансы, в случае нехватки каких-либо ресурсов вы всегда можете создать их при помощи Terraform.
-2. Альтернативный вариант: воспользуйтесь сервисом [Yandex Managed Service for Kubernetes](https://cloud.yandex.ru/services/managed-kubernetes)  
+2. Альтернативный вариант: воспользуйтесь сервисом [Yandex Managed Service for Kubernetes](https://cloud.yandex.ru/services/managed-kubernetes)  
   а. С помощью terraform resource для [kubernetes](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/kubernetes_cluster) создать **региональный** мастер kubernetes с размещением нод в разных 3 подсетях      
   б. С помощью terraform resource для [kubernetes node group](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/kubernetes_node_group)
   
@@ -82,52 +241,18 @@
 2. В файле `~/.kube/config` находятся данные для доступа к кластеру.
 3. Команда `kubectl get pods --all-namespaces` отрабатывает без ошибок.
 
+### Решение:  
+1. a. На предыдущем шаге мы подготовили инфраструктуру для разворачивания kubernetes кластера и файл [hosts.yml](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/02_kubernetes/hosts.yml).
+   б. Будем использовать [Kubespray](https://kubernetes.io/docs/setup/production-environment/tools/kubespray/).
+      Для этого клонируем репозиторий [Kubespray](https://github.com/kubernetes-sigs/kubespray) к себе.
+      В папке inventory/sample есть пример с набором ролей Ansible для создания кластера, скопируем его и туда же положим файл hosts.yml.
+      Теперь перейдём в папку конфигурации Ansible и инициализуем создание кластера:
+```
+$ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml 
+```
+
 ---
-
-## Решение:
-
-### Для развертывания будем использовать kubespray.
-
-Склонируем репозиторий:
-```
-git clone https://github.com/kubernetes-sigs/kubespray.git
-```
-
-При создании [инфраструктуры](https://github.com/Firewal7/netology-diplom/blob/main/terraform/inventory.tf) мы создали динамический [hosts.yaml](https://github.com/Firewal7/netology-diplom/blob/main/ansible/inventory/hosts.yaml) файл
-
-Воспользуемся этим hosts.yaml файлом и плайбуков в kubespray:
-```
-ansible-playbook -i /home/msi/diplom/ansible/inventory/hosts.yaml cluster.yml -b
-```
-
-![Ссылка 7](https://github.com/Firewal7/netology-diplom/blob/main/images/7.kubespray.jpg)
-
-#### Зайдём на master и проверим:
-
-```
-root@master:/home/ubuntu# sudo kubectl get pods --all-namespaces
-NAMESPACE     NAME                                       READY   STATUS    RESTARTS        AGE
-kube-system   calico-kube-controllers-6c7b7dc5d8-bh7ts   1/1     Running   0               3m53s
-kube-system   calico-node-kn76t                          1/1     Running   0               5m16s
-kube-system   calico-node-rtg4c                          1/1     Running   0               5m16s
-kube-system   calico-node-xsn2z                          1/1     Running   0               5m16s
-kube-system   coredns-69db55dd76-6xlr6                   1/1     Running   0               2m47s
-kube-system   coredns-69db55dd76-bzmpp                   1/1     Running   0               2m39s
-kube-system   dns-autoscaler-6f4b597d8c-pph6z            1/1     Running   0               2m40s
-kube-system   kube-apiserver-master                      1/1     Running   1               8m21s
-kube-system   kube-controller-manager-master             1/1     Running   2 (7m46s ago)   8m21s
-kube-system   kube-proxy-98q64                           1/1     Running   0               6m57s
-kube-system   kube-proxy-gwdh8                           1/1     Running   0               6m58s
-kube-system   kube-proxy-mhr57                           1/1     Running   0               6m57s
-kube-system   kube-scheduler-master                      1/1     Running   1               8m21s
-kube-system   nginx-proxy-node1                          1/1     Running   0               6m56s
-kube-system   nginx-proxy-node2                          1/1     Running   0               7m6s
-kube-system   nodelocaldns-sfglk                         1/1     Running   0               2m38s
-kube-system   nodelocaldns-wbspn                         1/1     Running   0               2m38s
-kube-system   nodelocaldns-wl87w                         1/1     Running   0               2m38s
-```
-
-#### Создание тестового приложения
+### Создание тестового приложения
 
 Для перехода к следующему этапу необходимо подготовить тестовое приложение, эмулирующее основное приложение разрабатываемое вашей компанией.
 
@@ -145,66 +270,6 @@ kube-system   nodelocaldns-wl87w                         1/1     Running   0    
 2. Регистри с собранным docker image. В качестве регистри может быть DockerHub или [Yandex Container Registry](https://cloud.yandex.ru/services/container-registry), созданный также с помощью terraform.
 
 ---
-
-## Решение:
-
-#### Подготовил приложение.
-
-[index.html](https://github.com/Firewal7/netology-diplom/blob/main/applications/index.html)
-
-[Dockerfile](https://github.com/Firewal7/netology-diplom/blob/main/applications/Dockerfile)
-
-#### Соберём образ командой: docker build -t bbb8c2e28d7d/applications:1.0 .
-
-```
-root@vm-mint:/home/msi/diplom/applications# docker build -t bbb8c2e28d7d/applications:1.0 .
-DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
-            Install the buildx component to build images with BuildKit:
-            https://docs.docker.com/go/buildx/
-
-Sending build context to Docker daemon  3.584kB
-Step 1/3 : FROM nginx:1.20
- ---> 0584b370e957
-Step 2/3 : WORKDIR /usr/share/nginx/html
- ---> Running in 9311527e261f
-Removing intermediate container 9311527e261f
- ---> c075e569bcb3
-Step 3/3 : COPY index.html /usr/share/nginx/html/
- ---> 7abaaecf2a28
-Successfully built 7abaaecf2a28
-Successfully tagged bbb8c2e28d7d/applications:1.0
-```
-
-#### Запускаем контейнер: docker run -d -p 8080:80 bbb8c2e28d7d/applications:1.0
-
-```
-root@vm-mint:/home/msi/diplom/applications# docker run -d -p 8080:80 bbb8c2e28d7d/applications:1.0
-a4af36b6e9c813b1b9ea4be86845f7e1cf417b6e969f122db3aa12fbd158ca4f
-
-root@vm-mint:/home/msi/diplom/applications# docker ps
-CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS         PORTS                  NAMES
-a4af36b6e9c8   bbb8c2e28d7d/applications:1.0   "/docker-entrypoint.…"   11 seconds ago   Up 9 seconds   0.0.0.0:8080->80/tcp   elated_blackburn
-```
-
-![Ссылка 11](https://github.com/Firewal7/netology-diplom/blob/main/images/11.brauzer.jpg)
-
-#### Загружаем в Dockerhub: docker push bbb8c2e28d7d/applications:1.0
-
-```
-root@vm-mint:/home/msi/diplom/applications# docker push bbb8c2e28d7d/applications:1.0
-The push refers to repository [docker.io/bbb8c2e28d7d/applications]
-5e62a8997aa9: Pushed 
-07ef16952879: Mounted from library/nginx 
-881700cb7ab2: Mounted from library/nginx 
-4f49c6d6dd07: Mounted from library/nginx 
-a64d597d6b14: Mounted from library/nginx 
-c2a3d4a53f9a: Mounted from library/nginx 
-fd95118eade9: Mounted from library/nginx 
-1.0: digest: sha256:1cd8e8edfc6b004e9e276c43fdfc75c93815e12cb7bdec67da565a1a1bf3f316 size: 1777
-```
-
-![Ссылка 13](https://github.com/Firewal7/netology-diplom/blob/main/images/13.dockerhub.jpg)
-
 ### Подготовка cистемы мониторинга и деплой приложения
 
 Уже должны быть готовы конфигурации для автоматического создания облачной инфраструктуры и поднятия Kubernetes кластера.  
@@ -224,222 +289,8 @@ fd95118eade9: Mounted from library/nginx
 2. Http доступ к web интерфейсу grafana.
 3. Дашборды в grafana отображающие состояние Kubernetes кластера.
 4. Http доступ к тестовому приложению.
+
 ---
-
-## Решение:
-
-### Развернём систему мониторинга с помощью Kube-Prometheus.
-
-#### Зайдёт на Master и склонируем репозиторий:
-
-```
-root@master:/home/ubuntu# git clone https://github.com/prometheus-operator/kube-prometheus.git
-Cloning into 'kube-prometheus'...
-remote: Enumerating objects: 19433, done.
-remote: Counting objects: 100% (6502/6502), done.
-remote: Compressing objects: 100% (490/490), done.
-remote: Total 19433 (delta 6312), reused 6015 (delta 6011), pack-reused 12931
-Receiving objects: 100% (19433/19433), 10.32 MiB | 13.09 MiB/s, done.
-Resolving deltas: 100% (13244/13244), done.
-
-```
-
-#### Переходим в каталог с kube-prometheus и развертываем контейнеры:
-
-<details>
-<summary>Вывод текста</summary>
-
-root@master:/home/ubuntu/kube-prometheus# sudo kubectl apply --server-side -f manifests/setup
-customresourcedefinition.apiextensions.k8s.io/alertmanagerconfigs.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/alertmanagers.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/podmonitors.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/probes.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/prometheuses.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/prometheusagents.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/prometheusrules.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/scrapeconfigs.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/servicemonitors.monitoring.coreos.com serverside-applied
-customresourcedefinition.apiextensions.k8s.io/thanosrulers.monitoring.coreos.com serverside-applied
-namespace/monitoring serverside-applied
-
-root@master:/home/ubuntu/kube-prometheus# sudo kubectl apply -f manifests/
-alertmanager.monitoring.coreos.com/main created
-networkpolicy.networking.k8s.io/alertmanager-main created
-poddisruptionbudget.policy/alertmanager-main created
-prometheusrule.monitoring.coreos.com/alertmanager-main-rules created
-secret/alertmanager-main created
-service/alertmanager-main created
-serviceaccount/alertmanager-main created
-servicemonitor.monitoring.coreos.com/alertmanager-main created
-clusterrole.rbac.authorization.k8s.io/blackbox-exporter created
-clusterrolebinding.rbac.authorization.k8s.io/blackbox-exporter created
-configmap/blackbox-exporter-configuration created
-deployment.apps/blackbox-exporter created
-networkpolicy.networking.k8s.io/blackbox-exporter created
-service/blackbox-exporter created
-serviceaccount/blackbox-exporter created
-servicemonitor.monitoring.coreos.com/blackbox-exporter created
-secret/grafana-config created
-secret/grafana-datasources created
-configmap/grafana-dashboard-alertmanager-overview created
-configmap/grafana-dashboard-apiserver created
-configmap/grafana-dashboard-cluster-total created
-configmap/grafana-dashboard-controller-manager created
-configmap/grafana-dashboard-grafana-overview created
-configmap/grafana-dashboard-k8s-resources-cluster created
-configmap/grafana-dashboard-k8s-resources-multicluster created
-configmap/grafana-dashboard-k8s-resources-namespace created
-configmap/grafana-dashboard-k8s-resources-node created
-configmap/grafana-dashboard-k8s-resources-pod created
-configmap/grafana-dashboard-k8s-resources-workload created
-configmap/grafana-dashboard-k8s-resources-workloads-namespace created
-configmap/grafana-dashboard-kubelet created
-configmap/grafana-dashboard-namespace-by-pod created
-configmap/grafana-dashboard-namespace-by-workload created
-configmap/grafana-dashboard-node-cluster-rsrc-use created
-configmap/grafana-dashboard-node-rsrc-use created
-configmap/grafana-dashboard-nodes-darwin created
-configmap/grafana-dashboard-nodes created
-configmap/grafana-dashboard-persistentvolumesusage created
-configmap/grafana-dashboard-pod-total created
-configmap/grafana-dashboard-prometheus-remote-write created
-configmap/grafana-dashboard-prometheus created
-configmap/grafana-dashboard-proxy created
-configmap/grafana-dashboard-scheduler created
-configmap/grafana-dashboard-workload-total created
-configmap/grafana-dashboards created
-deployment.apps/grafana created
-networkpolicy.networking.k8s.io/grafana created
-prometheusrule.monitoring.coreos.com/grafana-rules created
-service/grafana created
-serviceaccount/grafana created
-servicemonitor.monitoring.coreos.com/grafana created
-prometheusrule.monitoring.coreos.com/kube-prometheus-rules created
-clusterrole.rbac.authorization.k8s.io/kube-state-metrics created
-clusterrolebinding.rbac.authorization.k8s.io/kube-state-metrics created
-deployment.apps/kube-state-metrics created
-networkpolicy.networking.k8s.io/kube-state-metrics created
-prometheusrule.monitoring.coreos.com/kube-state-metrics-rules created
-service/kube-state-metrics created
-serviceaccount/kube-state-metrics created
-servicemonitor.monitoring.coreos.com/kube-state-metrics created
-prometheusrule.monitoring.coreos.com/kubernetes-monitoring-rules created
-servicemonitor.monitoring.coreos.com/kube-apiserver created
-servicemonitor.monitoring.coreos.com/coredns created
-servicemonitor.monitoring.coreos.com/kube-controller-manager created
-servicemonitor.monitoring.coreos.com/kube-scheduler created
-servicemonitor.monitoring.coreos.com/kubelet created
-clusterrole.rbac.authorization.k8s.io/node-exporter created
-clusterrolebinding.rbac.authorization.k8s.io/node-exporter created
-daemonset.apps/node-exporter created
-networkpolicy.networking.k8s.io/node-exporter created
-prometheusrule.monitoring.coreos.com/node-exporter-rules created
-service/node-exporter created
-serviceaccount/node-exporter created
-servicemonitor.monitoring.coreos.com/node-exporter created
-clusterrole.rbac.authorization.k8s.io/prometheus-k8s created
-clusterrolebinding.rbac.authorization.k8s.io/prometheus-k8s created
-networkpolicy.networking.k8s.io/prometheus-k8s created
-poddisruptionbudget.policy/prometheus-k8s created
-prometheus.monitoring.coreos.com/k8s created
-prometheusrule.monitoring.coreos.com/prometheus-k8s-prometheus-rules created
-rolebinding.rbac.authorization.k8s.io/prometheus-k8s-config created
-rolebinding.rbac.authorization.k8s.io/prometheus-k8s created
-rolebinding.rbac.authorization.k8s.io/prometheus-k8s created
-rolebinding.rbac.authorization.k8s.io/prometheus-k8s created
-role.rbac.authorization.k8s.io/prometheus-k8s-config created
-role.rbac.authorization.k8s.io/prometheus-k8s created
-role.rbac.authorization.k8s.io/prometheus-k8s created
-role.rbac.authorization.k8s.io/prometheus-k8s created
-service/prometheus-k8s created
-serviceaccount/prometheus-k8s created
-servicemonitor.monitoring.coreos.com/prometheus-k8s created
-apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
-clusterrole.rbac.authorization.k8s.io/prometheus-adapter created
-clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
-clusterrolebinding.rbac.authorization.k8s.io/prometheus-adapter created
-clusterrolebinding.rbac.authorization.k8s.io/resource-metrics:system:auth-delegator created
-clusterrole.rbac.authorization.k8s.io/resource-metrics-server-resources created
-configmap/adapter-config created
-deployment.apps/prometheus-adapter created
-networkpolicy.networking.k8s.io/prometheus-adapter created
-poddisruptionbudget.policy/prometheus-adapter created
-rolebinding.rbac.authorization.k8s.io/resource-metrics-auth-reader created
-service/prometheus-adapter created
-serviceaccount/prometheus-adapter created
-servicemonitor.monitoring.coreos.com/prometheus-adapter created
-clusterrole.rbac.authorization.k8s.io/prometheus-operator created
-clusterrolebinding.rbac.authorization.k8s.io/prometheus-operator created
-deployment.apps/prometheus-operator created
-networkpolicy.networking.k8s.io/prometheus-operator created
-prometheusrule.monitoring.coreos.com/prometheus-operator-rules created
-service/prometheus-operator created
-serviceaccount/prometheus-operator created
-servicemonitor.monitoring.coreos.com/prometheus-operator created
-</details>
-
-```
-root@master:/home/ubuntu/diplom-helm# sudo kubectl get po -n monitoring -o wide
-NAME                                   READY   STATUS    RESTARTS   AGE   IP               NODE     NOMINATED NODE   READINESS GATES
-alertmanager-main-0                    2/2     Running   0          47s   10.233.75.5      node2    <none>           <none>
-alertmanager-main-1                    2/2     Running   0          47s   10.233.75.4      node2    <none>           <none>
-alertmanager-main-2                    2/2     Running   0          47s   10.233.102.134   node1    <none>           <none>
-blackbox-exporter-6b5475894-s57bn      3/3     Running   0          88s   10.233.102.130   node1    <none>           <none>
-grafana-59844d49d5-rtzfm               1/1     Running   0          87s   10.233.102.131   node1    <none>           <none>
-kube-state-metrics-6bd55cf7d8-9c9wq    3/3     Running   0          86s   10.233.75.2      node2    <none>           <none>
-node-exporter-5mw64                    2/2     Running   0          86s   10.0.1.10        master   <none>           <none>
-node-exporter-klmkg                    2/2     Running   0          86s   10.0.2.11        node1    <none>           <none>
-node-exporter-m8xrc                    2/2     Running   0          86s   10.0.3.12        node2    <none>           <none>
-prometheus-adapter-74894c5547-t9q4z    1/1     Running   0          85s   10.233.75.3      node2    <none>           <none>
-prometheus-adapter-74894c5547-tb82q    1/1     Running   0          85s   10.233.102.132   node1    <none>           <none>
-prometheus-k8s-0                       1/2     Running   0          45s   10.233.102.135   node1    <none>           <none>
-prometheus-k8s-1                       2/2     Running   0          45s   10.233.75.6      node2    <none>           <none>
-prometheus-operator-78dd987cb4-drw9z   2/2     Running   0          85s   10.233.102.133   node1    <none>           <none>
-```
-
-#### Для доступа к интерфейсу изменим сетевую политику:
-
-[manifests](https://github.com/Firewal7/netology-diplom/blob/main/manifests/grafana-service.yml)
-
-```
-root@master:/home/ubuntu# sudo kubectl -n monitoring apply -f manifest/grafana-service.yml
-service/grafana configured
-networkpolicy.networking.k8s.io/grafana configured
-
-```
-#### Теперь зайти в Grafana можно по любому из адресов node1, node2, master (http://158.160.18.187:30001/) Логи стандартные admin admin.
-
-![Ссылка 14](https://github.com/Firewal7/netology-diplom/blob/main/images/14.grafana.jpg)
-
-## Далее развернём наше приложение в кластере Kubernetes.
-
-[helm-chart](https://github.com/Firewal7/netology-diplom/tree/main/helm/applications)
-
-```
-root@master:/home/ubuntu/diplom-helm# sudo helm install applications /home/ubuntu/diplom-helm/applications  --set container.tag=1.0
-NAME: applications
-LAST DEPLOYED: Tue Apr  2 17:05:46 2024
-NAMESPACE: default
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-
-root@master:/home/ubuntu/diplom-helm# sudo helm list
-NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
-applications    default         1               2024-04-02 17:05:46.933031575 +0000 UTC deployed        applications-1  1.0     
-```
-
-![Ссылка 15](https://github.com/Firewal7/netology-diplom/blob/main/images/15.deploy.jpg)
-
-Переходим по IP адресу любой из node порт 30003 который задали в service.yaml, и видим работу приложения. 
-
-![Ссылка 16](https://github.com/Firewal7/netology-diplom/blob/main/images/16.node1.jpg)
-
-![Ссылка 17](https://github.com/Firewal7/netology-diplom/blob/main/images/17.node2.jpg)
-
-![Ссылка 18](https://github.com/Firewal7/netology-diplom/blob/main/images/18.master.jpg)
-
-
 ### Установка и настройка CI/CD
 
 Осталось настроить ci/cd систему для автоматической сборки docker image и деплоя приложения при изменении кода.
@@ -458,209 +309,13 @@ applications    default         1               2024-04-02 17:05:46.933031575 +0
 3. При создании тега (например, v1.0.0) происходит сборка и отправка с соответствующим label в регистри, а также деплой соответствующего Docker образа в кластер Kubernetes.
 
 ---
-
-## Решение:
-
-#### Совместно с развёрткой облачной инфраструктуры развернул две ВМ teamcity-server и teamcity-agent.
-
-#### Развернём плейбуками на машинах server и agent сам teamcity и установим postgresgl на server.  
-
-```
-ansible-playbook -i /home/msi/diplom/ansible/inventory/hosts.yaml --become --become-user=root /home/msi/diplom/ansible/playbooks/teamcity.yml
-
-PLAY RECAP *****************************************************************************************************************************************************************************************************
-teamcity-agent             : ok=6    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-teamcity-server            : ok=6    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
-```
-```
-ansible-playbook -i /home/msi/diplom/ansible/inventory/ --become --become-user=root /home/msi/diplom/ansible/playbooks/postgresql.yml
-
-PLAY RECAP *****************************************************************************************************************************************************************************************************
-teamcity-server            : ok=13   changed=10   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
-```
-
-#### Зайдём на адрес Teamcity:
-
-![Ссылка 21](https://github.com/Firewal7/netology-diplom/blob/main/images/21.starttc.jpg)
-
-#### Данные для инициализации берём с конфига [Postgresgl](https://github.com/Firewal7/netology-diplom/blob/main/ansible/playbooks/postgresql.yml), и устанавливаем предложенный драйвер JDBC.
-
-![Ссылка 22](https://github.com/Firewal7/netology-diplom/blob/main/images/22.initial.jpg)
-
-#### Авторизируем агента:
-
-![Ссылка 23](https://github.com/Firewal7/netology-diplom/blob/main/images/23.agent.jpg)
-
-#### Подключил [Github](https://github.com/Firewal7/diplom-applications.git) 
-
-![Ссылка 24](https://github.com/Firewal7/netology-diplom/blob/main/images/24.connect.git.jpg)
-
-#### Подключил [Dockerhub](https://hub.docker.com/repository/docker/bbb8c2e28d7d/applications/general)
-
-![Ссылка 25](https://github.com/Firewal7/netology-diplom/blob/main/images/25.connect.docker.jpg)
-
-#### Подключил в Build Features Docker Support
-
-![Ссылка 26](https://github.com/Firewal7/netology-diplom/blob/main/images/26.support.jpg)
-
-### Соберём проект: 
-
-#### [Полный код Build Steps находтся здесь](https://github.com/Firewal7/netology-diplom/tree/main/Teamcity)
-
-#### Этот скрипт предназначен для получения тега коммита и установки его в качестве параметра сборки.
-
-![Ссылка 27](https://github.com/Firewal7/netology-diplom/blob/main/images/27.commitag.jpg)
-
-#### Создаём образы Docker:
-
-![Ссылка 28](https://github.com/Firewal7/netology-diplom/blob/main/images/28.docker.jpg)
-
-#### Отправка собранно образа в Dockerhub:
-
-![Ссылка 29](https://github.com/Firewal7/netology-diplom/blob/main/images/29.dockerhub.jpg)
-
-### Проверяем:
-
-[Репозиторий Git](https://github.com/Firewal7/diplom-applications.git)
-
-#### Изменили версию приложения и запушили.
-
-```
-root@vm-mint:/home/msi/diplom-applications# git add *
-
-root@vm-mint:/home/msi/diplom-applications# git commit -m "Version 2.0"
-[main 0c30f49] Version 2.0
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-root@vm-mint:/home/msi/diplom-applications# git tag -a 2.0 -m "Version 2.0"
-
-root@vm-mint:/home/msi/diplom-applications# git push origin main
-Username for 'https://github.com': Firewal7
-Password for 'https://Firewal7@github.com': 
-Перечисление объектов: 5, готово.
-Подсчет объектов: 100% (5/5), готово.
-При сжатии изменений используется до 3 потоков
-Сжатие объектов: 100% (3/3), готово.
-Запись объектов: 100% (3/3), 351 байт | 351.00 КиБ/с, готово.
-Всего 3 (изменений 1), повторно использовано 0 (изменений 0), повторно использовано пакетов 0
-remote: Resolving deltas: 100% (1/1), completed with 1 local object.
-To https://github.com/Firewal7/diplom-applications.git
-   f981c64..0c30f49  main -> main
-
-root@vm-mint:/home/msi/diplom-applications# git push origin 2.0
-Username for 'https://github.com': Firewal7
-Password for 'https://Firewal7@github.com': 
-Перечисление объектов: 1, готово.
-Подсчет объектов: 100% (1/1), готово.
-Запись объектов: 100% (1/1), 182 байта | 182.00 КиБ/с, готово.
-Всего 1 (изменений 0), повторно использовано 0 (изменений 0), повторно использовано пакетов 0
-To https://github.com/Firewal7/diplom-applications.git
- * [new tag]         2.0 -> 2.0
-```
-
-![Ссылка 30](https://github.com/Firewal7/netology-diplom/blob/main/images/30.git.jpg)
-
-![Ссылка 31](https://github.com/Firewal7/netology-diplom/blob/main/images/31.build.jpg)
-
-![Ссылка 33](https://github.com/Firewal7/netology-diplom/blob/main/images/33.dockerhub.jpg)
-
-### Добавим изменение тега, создание helm и выгрузку его в Git с последующим апдейтом в кластере Kubernetes:
-
-![Ссылка 34](https://github.com/Firewal7/netology-diplom/blob/main/images/34.gethelm.jpg)
-
-![Ссылка 35](https://github.com/Firewal7/netology-diplom/blob/main/images/35.Changehelm.jpg)
-
-![Ссылка 35.1](https://github.com/Firewal7/netology-diplom/blob/main/images/35.1.Changehelm.jpg)
-
-![Ссылка 36](https://github.com/Firewal7/netology-diplom/blob/main/images/36.ssh.jpg)
-
-![Ссылка 36.1](https://github.com/Firewal7/netology-diplom/blob/main/images/36.1.values.jpg)
-
-### Запустим изменения: 
-
-```
-root@vm-mint:/home/msi/diplom-applications# git add *
-
-root@vm-mint:/home/msi/diplom-applications# git commit -m "Version 14.0"
-[main 577a6f0] Version 14.0
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-root@vm-mint:/home/msi/diplom-applications# git tag -a 14.0 -m "Version 14.0"
-
-root@vm-mint:/home/msi/diplom-applications# git push origin main
-Username for 'https://github.com': Firewal7
-Password for 'https://Firewal7@github.com': 
-Перечисление объектов: 5, готово.
-Подсчет объектов: 100% (5/5), готово.
-При сжатии изменений используется до 3 потоков
-Сжатие объектов: 100% (3/3), готово.
-Запись объектов: 100% (3/3), 352 байта | 352.00 КиБ/с, готово.
-Всего 3 (изменений 1), повторно использовано 0 (изменений 0), повторно использовано пакетов 0
-remote: Resolving deltas: 100% (1/1), completed with 1 local object.
-To https://github.com/Firewal7/diplom-applications.git
-   a6a294a..577a6f0  main -> main
-
-root@vm-mint:/home/msi/diplom-applications# git push origin 14.0
-Username for 'https://github.com': Firewal7
-Password for 'https://Firewal7@github.com': 
-Перечисление объектов: 1, готово.
-Подсчет объектов: 100% (1/1), готово.
-Запись объектов: 100% (1/1), 184 байта | 184.00 КиБ/с, готово.
-Всего 1 (изменений 0), повторно использовано 0 (изменений 0), повторно использовано пакетов 0
-To https://github.com/Firewal7/diplom-applications.git
- * [new tag]         14.0 -> 14.0
-```
-
-![Ссылка 37](https://github.com/Firewal7/netology-diplom/blob/main/images/37.run.jpg)
-
-![Ссылка 38](https://github.com/Firewal7/netology-diplom/blob/main/images/38.dockerhub.jpg)
-
-![Ссылка 39](https://github.com/Firewal7/netology-diplom/blob/main/images/39.master.jpg)
-
-#### Зайдём на наши ноды:
-
-![Ссылка 40](https://github.com/Firewal7/netology-diplom/blob/main/images/40.app.jpg)
-
-![Ссылка 41](https://github.com/Firewal7/netology-diplom/blob/main/images/41.app.jpg)
-
-#### Пробуем обновить версию ещё раз:
-
-![Ссылка 42](https://github.com/Firewal7/netology-diplom/blob/main/images/42.run.jpg)
-
-![Ссылка 43](https://github.com/Firewal7/netology-diplom/blob/main/images/43.git.jpg)
-
-![Ссылка 44](https://github.com/Firewal7/netology-diplom/blob/main/images/44.dockerhub.jpg)
-
-![Ссылка 45](https://github.com/Firewal7/netology-diplom/blob/main/images/45.master.jpg)
-
-![Ссылка 46](https://github.com/Firewal7/netology-diplom/blob/main/images/46.app.jpg)
-
-![Ссылка 47](https://github.com/Firewal7/netology-diplom/blob/main/images/47.app.jpg)
-
 ## Что необходимо для сдачи задания?
 
 1. Репозиторий с конфигурационными файлами Terraform и готовность продемонстрировать создание всех ресурсов с нуля.
-
-- [Репозиторий с Terraform](https://github.com/Firewal7/netology-diplom/tree/main/terraform)
-
 2. Пример pull request с комментариями созданными atlantis'ом или снимки экрана из Terraform Cloud или вашего CI-CD-terraform pipeline.
-
 3. Репозиторий с конфигурацией ansible, если был выбран способ создания Kubernetes кластера при помощи ansible.
-
-- [Репозиторий с ansible](https://github.com/Firewal7/netology-diplom/tree/main/ansible)
- 
 4. Репозиторий с Dockerfile тестового приложения и ссылка на собранный docker image.
-
-- [Репозиторий с applications](https://github.com/Firewal7/diplom-applications)
-- [Репозиторий Dockerhub](https://hub.docker.com/repository/docker/bbb8c2e28d7d/applications/general)
-
 5. Репозиторий с конфигурацией Kubernetes кластера.
-
-- [Репозиторий github](https://github.com/Firewal7/netology-diplom/blob/main/ansible/inventory/hosts.yaml)
-
 6. Ссылка на тестовое приложение и веб интерфейс Grafana с данными доступа.
-
-- [Applications](http://158.160.133.254:30003)
-- [Grafana](http://158.160.133.254:30001) Лог: admin, Пасс: admin
-
 7. Все репозитории рекомендуется хранить на одном ресурсе (github, gitlab)
+
