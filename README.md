@@ -92,8 +92,8 @@ $ yc config set service-account-key authorized_key.json
   
 2. Устанавливаем и настраиваем [terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart)  
    Подготавливаем конфигурацию [Terraform](https://github.com/michail-77/my-diplom-lokhmanov/tree/main/01_terraform)  
-   Перед запуском проверим конфигурацию командой terraform validate
-   ```
+   Перед запуском проверим конфигурацию командой terraform validate.
+```
 user@DESKTOP-RAJIAFA:/mnt/d/Netology/Diplom/my-diplom-lokhmanov/01_terraform$ terraform validate
 Success! The configuration is valid.
    
@@ -212,7 +212,7 @@ Plan: 1 to add, 0 to change, 1 to destroy.
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
 Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly these actions  
 if you run "terraform apply" now.
-   ```
+```
 3. Выполняем команду terraform apply и у нас без дополнительных ручных действий разворачивается инфраструктура в яндекс облаке.
    ![1](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/1_вирт_машины.png)  
    ![2](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/2_сети.png)  
