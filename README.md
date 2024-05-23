@@ -242,14 +242,17 @@ if you run "terraform apply" now.
 3. Команда `kubectl get pods --all-namespaces` отрабатывает без ошибок.
 
 ### Решение:  
-1. a. На предыдущем шаге мы подготовили инфраструктуру для разворачивания kubernetes кластера и файл [hosts.yml](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/02_kubernetes/hosts.yml).
-   б. Будем использовать [Kubespray](https://kubernetes.io/docs/setup/production-environment/tools/kubespray/).
-      Для этого клонируем репозиторий [Kubespray](https://github.com/kubernetes-sigs/kubespray) к себе.
-      В папке inventory/sample есть пример с набором ролей Ansible для создания кластера, скопируем его и туда же положим файл hosts.yml.
-      Теперь перейдём в папку конфигурации Ansible и инициализуем создание кластера:
+1. a. На предыдущем шаге мы подготовили инфраструктуру для разворачивания kubernetes кластера и файл [hosts.yml](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/02_kubernetes/hosts.yml).  
+   б. Будем использовать [Kubespray](https://kubernetes.io/docs/setup/production-environment/tools/kubespray/).  
+      Для этого клонируем репозиторий [Kubespray](https://github.com/kubernetes-sigs/kubespray) к себе.  
+      В папке inventory/sample есть пример с набором ролей Ansible для создания кластера, скопируем его и туда же положим файл hosts.yml.  
+      Теперь перейдём в папку конфигурации Ansible и инициализуем создание кластера:  
 ```
 $ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml 
 ```
+![7](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/7_cluster.png)
+Команда `kubectl get pods --all-namespaces` отрабатывает без ошибок
+![8](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/8_namespace%20pods.png)
 
 ---
 ### Создание тестового приложения
