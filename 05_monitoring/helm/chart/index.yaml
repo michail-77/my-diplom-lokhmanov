@@ -8,7 +8,7 @@ entries:
     digest: 43cc3f6ef914991a80adc5a979a3a6f7bd59561a6f65a7006133479035360981
     maintainers:
     - email: michail.77@mail.ru
-      name: Lokhmanov Mikhail
+      name: michail77
     name: applications
     type: application
     urls:
