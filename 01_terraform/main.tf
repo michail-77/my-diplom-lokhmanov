@@ -1,8 +1,8 @@
 # Master VM
 resource "yandex_compute_instance" "master" {
-  name     = local.instance_master
-  hostname = local.instance_master
-  zone     = var.default_zone_a
+  name                      = local.instance_master
+  hostname                  = local.instance_master
+  zone                      = var.default_zone_a
   allow_stopping_for_update = true
 
   platform_id = "standard-v1"
@@ -59,9 +59,9 @@ resource "yandex_compute_instance" "master" {
 
 # Node1 VM
 resource "yandex_compute_instance" "node1" {
-  name     = local.instance_node1
-  hostname = local.instance_node1
-  zone     = var.default_zone_b
+  name                      = local.instance_node1
+  hostname                  = local.instance_node1
+  zone                      = var.default_zone_b
   allow_stopping_for_update = true
 
   platform_id = "standard-v2"
@@ -94,9 +94,9 @@ resource "yandex_compute_instance" "node1" {
 }
 # Node2 VM
 resource "yandex_compute_instance" "node2" {
-  name     = local.instance_node2
-  hostname = local.instance_node2
-  zone     = var.default_zone_d
+  name                      = local.instance_node2
+  hostname                  = local.instance_node2
+  zone                      = var.default_zone_d
   allow_stopping_for_update = true
 
   platform_id = "standard-v2"
@@ -130,9 +130,9 @@ resource "yandex_compute_instance" "node2" {
 
 # Teamcity-Server
 resource "yandex_compute_instance" "teamcity-server" {
-  name     = local.instance_teamcity-server
-  hostname = local.instance_teamcity-server
-  zone     = var.default_zone_a
+  name                      = local.instance_teamcity-server
+  hostname                  = local.instance_teamcity-server
+  zone                      = var.default_zone_a
   allow_stopping_for_update = true
 
   platform_id = "standard-v2"
@@ -166,9 +166,9 @@ resource "yandex_compute_instance" "teamcity-server" {
 
 # Teamcity-Agent
 resource "yandex_compute_instance" "teamcity-agent" {
-  name     = local.instance_teamcity-agent
-  hostname = local.instance_teamcity-agent
-  zone     = var.default_zone_a
+  name                      = local.instance_teamcity-agent
+  hostname                  = local.instance_teamcity-agent
+  zone                      = var.default_zone_a
   allow_stopping_for_update = true
 
   platform_id = "standard-v2"
