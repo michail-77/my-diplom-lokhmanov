@@ -3,6 +3,7 @@ resource "yandex_compute_instance" "master" {
   name     = local.instance_master
   hostname = local.instance_master
   zone     = var.default_zone_a
+  allow_stopping_for_update = true
 
   platform_id = "standard-v1"
   resources {
@@ -61,8 +62,9 @@ resource "yandex_compute_instance" "node1" {
   name     = local.instance_node1
   hostname = local.instance_node1
   zone     = var.default_zone_b
+  allow_stopping_for_update = true
 
-  platform_id = "standard-v1"
+  platform_id = "standard-v2"
   resources {
     cores         = var.public_resources_node.cores
     memory        = var.public_resources_node.memory
@@ -95,6 +97,7 @@ resource "yandex_compute_instance" "node2" {
   name     = local.instance_node2
   hostname = local.instance_node2
   zone     = var.default_zone_d
+  allow_stopping_for_update = true
 
   platform_id = "standard-v2"
   resources {
@@ -125,72 +128,74 @@ resource "yandex_compute_instance" "node2" {
   }
 }
 
-# # Teamcity-Server
-# resource "yandex_compute_instance" "teamcity-server" {
-#   name     = local.instance_teamcity-server
-#   hostname = local.instance_teamcity-server
-#   zone     = var.default_zone_a
+# Teamcity-Server
+resource "yandex_compute_instance" "teamcity-server" {
+  name     = local.instance_teamcity-server
+  hostname = local.instance_teamcity-server
+  zone     = var.default_zone_a
+  allow_stopping_for_update = true
 
-#   platform_id = "standard-v1"
-#   resources {
-#     cores         = var.teamcity_resources_server.cores
-#     memory        = var.teamcity_resources_server.memory
-#     core_fraction = var.teamcity_resources_server.core_fraction
-#   }
+  platform_id = "standard-v2"
+  resources {
+    cores         = var.teamcity_resources_server.cores
+    memory        = var.teamcity_resources_server.memory
+    core_fraction = var.teamcity_resources_server.core_fraction
+  }
 
-#   boot_disk {
-#     initialize_params {
-#       image_id = var.public_image
-#       size     = var.teamcity_resources_server.size
-#     }
-#   }
+  boot_disk {
+    initialize_params {
+      image_id = var.public_image
+      size     = var.teamcity_resources_server.size
+    }
+  }
 
-#   scheduling_policy {
-#     preemptible = true
-#   }
+  scheduling_policy {
+    preemptible = true
+  }
 
-#   network_interface {
-#     subnet_id  = yandex_vpc_subnet.subnet["central1-a"].id
-#     nat        = true
-#     ip_address = "10.0.1.44"
-#   }
+  network_interface {
+    subnet_id  = yandex_vpc_subnet.subnet["central1-a"].id
+    nat        = true
+    ip_address = "10.0.1.44"
+  }
 
-#   metadata = {
-#     ssh-keys = "ubuntu:${file(var.ssh_public_key_path)}"
-#   }
-# }
+  metadata = {
+    ssh-keys = "ubuntu:${file(var.ssh_public_key_path)}"
+  }
+}
 
-# # Teamcity-Agent
-# resource "yandex_compute_instance" "teamcity-agent" {
-#   name     = local.instance_teamcity-agent
-#   hostname = local.instance_teamcity-agent
-#   zone     = var.default_zone_a
+# Teamcity-Agent
+resource "yandex_compute_instance" "teamcity-agent" {
+  name     = local.instance_teamcity-agent
+  hostname = local.instance_teamcity-agent
+  zone     = var.default_zone_a
+  allow_stopping_for_update = true
 
-#   platform_id = "standard-v1"
-#   resources {
-#     cores         = var.teamcity_resources_agent.cores
-#     memory        = var.teamcity_resources_agent.memory
-#     core_fraction = var.teamcity_resources_agent.core_fraction
-#   }
+  platform_id = "standard-v2"
+  resources {
+    cores         = var.teamcity_resources_agent.cores
+    memory        = var.teamcity_resources_agent.memory
+    core_fraction = var.teamcity_resources_agent.core_fraction
+  }
 
-#   boot_disk {
-#     initialize_params {
-#       image_id = var.public_image
-#       size     = var.teamcity_resources_agent.size
-#     }
-#   }
+  boot_disk {
+    initialize_params {
+      image_id = var.public_image
+      size     = var.teamcity_resources_agent.size
+    }
+  }
 
-#   scheduling_policy {
-#     preemptible = true
-#   }
+  scheduling_policy {
+    preemptible = true
+  }
 
-#   network_interface {
-#     subnet_id  = yandex_vpc_subnet.subnet["central1-a"].id
-#     nat        = true
-#     ip_address = "10.0.1.34"
-#   }
+  network_interface {
+    subnet_id  = yandex_vpc_subnet.subnet["central1-a"].id
+    nat        = true
+    ip_address = "10.0.1.34"
+  }
 
-#   metadata = {
-#     ssh-keys = "ubuntu:${file(var.ssh_public_key_path)}"
-#   }
-# }
+  metadata = {
+    ssh-keys = "ubuntu:${file(var.ssh_public_key_path)}"
+  }
+}
