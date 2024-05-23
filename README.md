@@ -249,10 +249,32 @@ if you run "terraform apply" now.
       Теперь перейдём в папку конфигурации Ansible и инициализуем создание кластера:  
 ```
 $ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml 
+```  
+![7](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/7_cluster.png)  
+Команда `kubectl get pods --all-namespaces` отрабатывает без ошибок  
+![8](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/8_namespace%20pods.png)  
+файл `~/.kube/config` выглядит так
 ```
-![7](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/7_cluster.png)
-Команда `kubectl get pods --all-namespaces` отрабатывает без ошибок
-![8](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/8_namespace%20pods.png)
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQW...
+    server: https://178.154.224.67:6443
+  name: cluster.local
+contexts:
+- context:
+    cluster: cluster.local
+    user: kubernetes-admin
+  name: kubernetes-admin@cluster.local
+current-context: kubernetes-admin@cluster.local
+kind: Config
+preferences: {}
+users:
+- name: kubernetes-admin
+  user:
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURLVENDQWhHZ0F3SUJBZ0lJ...
+    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBM3dzY0du...
+```
 
 ---
 ### Создание тестового приложения
@@ -271,6 +293,10 @@ $ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml
 
 1. Git репозиторий с тестовым приложением и Dockerfile.
 2. Регистри с собранным docker image. В качестве регистри может быть DockerHub или [Yandex Container Registry](https://cloud.yandex.ru/services/container-registry), созданный также с помощью terraform.
+
+### Решение:  
+Создал git репозиторий [nginx](https://github.com/michail-77/nginx) и [Dockerfile](https://github.com/michail-77/nginx/blob/main/Dockerfile).  
+[DockerHub](https://hub.docker.com) с собранным [docker image](https://hub.docker.com/repository/docker/michail77/image_nginx/general).  
 
 ---
 ### Подготовка cистемы мониторинга и деплой приложения
