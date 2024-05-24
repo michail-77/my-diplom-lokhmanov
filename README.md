@@ -401,7 +401,7 @@ my-app-7b4b84c86-prpk5   1/1     Running   0          82s
 и если не затруднит, не могли бы помочь... или немного подождать, я за выходные постараюсь доделать.
 ```  
 
-Для автоматической сборки docker image и деплоя приложения при изменении кода буду использовать [Github actions](https://docs.github.com/ru/actions)
+Для автоматической сборки docker image и деплоя приложения при изменении кода буду использовать [Github actions](https://docs.github.com/ru/actions)  
 CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)  
 
 
