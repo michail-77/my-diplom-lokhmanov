@@ -1,9 +1,0 @@
-# Default Values for my Helm Chart
-
-container:
-  image:
-    repository: michail77/image_nginx
-    pullPolicy: IfNotPresent
-    tag: "latest"
-
-replicaCount: 1
