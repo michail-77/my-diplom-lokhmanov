@@ -244,7 +244,14 @@ if you run "terraform apply" now.
 ### Решение:  
 1. a. На предыдущем шаге мы подготовили инфраструктуру для разворачивания kubernetes кластера и файл [hosts.yml](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/02_kubernetes/hosts.yml).  
    б. Будем использовать [Kubespray](https://kubernetes.io/docs/setup/production-environment/tools/kubespray/).  
-      Для этого клонируем репозиторий [Kubespray](https://github.com/kubernetes-sigs/kubespray) к себе.  
+      Для этого клонируем репозиторий [Kubespray](https://github.com/kubernetes-sigs/kubespray) к себе.
+      Установим зависимости:
+```
+$ ansible-galaxy install -r requirements.yml
+Starting galaxy collection install process
+Process install dependency map
+Cloning into '/home/user/.ansible/tmp/ansible-local-432965cm3702v/tmpp9rpr3o9/kubespray7dhh390_'...
+```        
       В папке inventory/sample есть пример с набором ролей Ansible для создания кластера, скопируем его и туда же положим файл hosts.yml.  
       Теперь перейдём в папку конфигурации Ansible и инициализуем создание кластера:  
 ```
@@ -297,6 +304,8 @@ users:
 ### Решение:  
 Создал git репозиторий [nginx](https://github.com/michail-77/nginx) и [Dockerfile](https://github.com/michail-77/nginx/blob/main/Dockerfile).  
 [DockerHub](https://hub.docker.com) с собранным [docker image](https://hub.docker.com/repository/docker/michail77/image_nginx/general).  
+![9](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/9_Docker_image_nginx_2.png)  
+![10](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/10_Docker_image_nginx.png)  
 
 ---
 ### Подготовка cистемы мониторинга и деплой приложения
@@ -318,6 +327,52 @@ users:
 2. Http доступ к web интерфейсу grafana.
 3. Дашборды в grafana отображающие состояние Kubernetes кластера.
 4. Http доступ к тестовому приложению.
+### Решение:  
+Развернём систему мониторинга с помощью Kube-Prometheus.
+Зайдёт на Master и склонируем репозиторий: 
+#git clone https://github.com/prometheus-operator/kube-prometheus.git
+Переходим в каталог с kube-prometheus и развертываем контейнеры:
+ $sudo kubectl apply --server-side -f manifests/setup
+ $sudo kubectl apply -f manifests/
+```
+ubuntu@master:~/kube-prometheus$ sudo kubectl get po -n monitoring -o wide
+NAME                                   READY   STATUS    RESTARTS        AGE     IP               NODE     NOMINATED NODE   READINESS GATES
+alertmanager-main-0                    1/2     Running   1 (48s ago)     2m38s   10.233.75.31     node2    <none>           <none>
+alertmanager-main-1                    1/2     Running   1 (46s ago)     2m37s   10.233.75.9      node2    <none>           <none>
+alertmanager-main-2                    1/2     Running   1 (47s ago)     2m38s   10.233.75.27     node2    <none>           <none>
+blackbox-exporter-7c7f95db96-2vv24     3/3     Running   3 (6m21s ago)   13h     10.233.102.169   node1    <none>           <none>
+grafana-85c87f8769-fs27l               1/1     Running   1 (6m21s ago)   13h     10.233.102.159   node1    <none>           <none>
+kube-state-metrics-699859d994-m7ns2    3/3     Running   5 (109s ago)    13h     10.233.102.160   node1    <none>           <none>
+node-exporter-d82sk                    2/2     Running   2 (5m35s ago)   22h     10.0.1.10        master   <none>           <none>
+node-exporter-mx6m6                    2/2     Running   2 (7m20s ago)   22h     10.0.3.12        node2    <none>           <none>
+node-exporter-qrczs                    2/2     Running   4 (6m21s ago)   22h     10.0.2.11        node1    <none>           <none>
+prometheus-adapter-77f8587965-9w8f6    1/1     Running   2 (107s ago)    7h39m   10.233.102.155   node1    <none>           <none>
+prometheus-adapter-77f8587965-lx644    1/1     Running   3 (107s ago)    13h     10.233.102.163   node1    <none>           <none>
+prometheus-k8s-0                       2/2     Running   0               2m38s   10.233.75.62     node2    <none>           <none>
+prometheus-k8s-1                       2/2     Running   2 (6m21s ago)   9h      10.233.102.164   node1    <none>           <none>
+prometheus-operator-586f75fb74-92fvk   2/2     Running   3 (105s ago)    7h39m   10.233.102.161   node1    <none>           <none>
+```
+Для доступа к интерфейсу изменим сетевую политику и запустим manifest/grafana-service:
+```
+root@master:/home/ubuntu# sudo kubectl -n monitoring apply -f manifest/grafana-service.yml
+service/grafana configured
+networkpolicy.networking.k8s.io/grafana configured
+```
+Http доступ к web интерфейсу grafana (http://158.160.49.210:30001).
+![11](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/11_grafana.png)  
+
+Деплоим приложение
+```
+$ kubectl apply -f dep-my-nginx.yml    
+namespace/netology created
+deployment.apps/my-app created
+service/nginx-my created
+$ k get pods -n netology
+NAME                     READY   STATUS    RESTARTS   AGE
+my-app-7b4b84c86-mrjmm   1/1     Running   0          2m5s
+my-app-7b4b84c86-prpk5   1/1     Running   0          82s
+```
+
 
 ---
 ### Установка и настройка CI/CD
