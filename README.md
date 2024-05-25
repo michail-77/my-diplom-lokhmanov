@@ -405,7 +405,8 @@ my-app-7b4b84c86-prpk5   1/1     Running   0          82s
 CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)  
 
 Настраивал по данной статье https://nicwortel.nl/blog/2022/continuous-deployment-to-kubernetes-with-github-actions , но что-то не получается с автоизацией разобраться.
-![12]()
+![12](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/12_cicd.png)
+
 
 
 ---
