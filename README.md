@@ -404,6 +404,8 @@ my-app-7b4b84c86-prpk5   1/1     Running   0          82s
 Для автоматической сборки docker image и деплоя приложения при изменении кода буду использовать [Github actions](https://docs.github.com/ru/actions)  
 CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)  
 
+Настраивал по данной статье https://nicwortel.nl/blog/2022/continuous-deployment-to-kubernetes-with-github-actions , но что-то не получается с автоизацией разобраться.
+
 
 ---
 ## Что необходимо для сдачи задания?
