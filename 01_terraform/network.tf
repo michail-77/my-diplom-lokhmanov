@@ -31,6 +31,3 @@ resource "yandex_vpc_subnet" "subnet" {
   v4_cidr_blocks = [each.value.cidr_block]
 }
 
-# resource "yandex_vpc_network" "vpc-network-private" {
-#   name = "vpc-network-private"
-# }
