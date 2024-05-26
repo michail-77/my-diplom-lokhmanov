@@ -255,7 +255,7 @@ Starting galaxy collection install process
 Process install dependency map
 Cloning into '/home/user/.ansible/tmp/ansible-local-432965cm3702v/tmpp9rpr3o9/kubespray7dhh390_'...
 ```        
-      В папке inventory/sample есть пример с набором ролей Ansible для создания кластера, скопируем его и туда же положим файл hosts.yml.  
+      В папке inventory/sample есть пример с набором ролей Ansible для создания кластера, скопируем его, переименуем в inventory/mycluster и так же в mycluster скопируем файл hosts.yml.  
       Теперь перейдём в папку конфигурации Ansible и инициализуем создание кластера:  
 ```
 $ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml 
