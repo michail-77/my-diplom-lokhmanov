@@ -6,7 +6,7 @@ terraform {
     }
   }
   required_version = ">=0.13"
-    backend "s3" {
+  backend "s3" {
     # Укажите данные вашего S3 bucket для хранения состояния Terraform
     endpoint = "storage.yandexcloud.net"
     bucket   = "yc-backend"
