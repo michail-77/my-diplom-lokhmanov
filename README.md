@@ -331,12 +331,12 @@ users:
 3. Дашборды в grafana отображающие состояние Kubernetes кластера.
 4. Http доступ к тестовому приложению.
 ### Решение:  
-Развернём систему мониторинга с помощью Kube-Prometheus.
-Зайдёт на Master и склонируем репозиторий: 
-#git clone https://github.com/prometheus-operator/kube-prometheus.git
-Переходим в каталог с kube-prometheus и развертываем контейнеры:
- $sudo kubectl apply --server-side -f manifests/setup
- $sudo kubectl apply -f manifests/
+Развернём систему мониторинга с помощью Kube-Prometheus.  
+Зайдёт на Master и склонируем репозиторий:  
+#git clone https://github.com/prometheus-operator/kube-prometheus.git  
+Переходим в каталог с kube-prometheus и развертываем контейнеры:  
+ $sudo kubectl apply --server-side -f manifests/setup  
+ $sudo kubectl apply -f manifests/  
 ```
 ubuntu@master:~/kube-prometheus$ sudo kubectl get po -n monitoring -o wide
 NAME                                   READY   STATUS    RESTARTS        AGE     IP               NODE     NOMINATED NODE   READINESS GATES
@@ -355,18 +355,19 @@ prometheus-k8s-0                       2/2     Running   0               2m38s  
 prometheus-k8s-1                       2/2     Running   2 (6m21s ago)   9h      10.233.102.164   node1    <none>           <none>
 prometheus-operator-586f75fb74-92fvk   2/2     Running   3 (105s ago)    7h39m   10.233.102.161   node1    <none>           <none>
 ```
-Для доступа к интерфейсу изменим сетевую политику и запустим manifest/grafana-service:
+Для доступа к интерфейсу изменим сетевую политику и запустим [manifest/grafana-service](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/04_kube_prometheus/grafana-service.yml):
 ```
 root@master:/home/ubuntu# sudo kubectl -n monitoring apply -f manifest/grafana-service.yml
 service/grafana configured
 networkpolicy.networking.k8s.io/grafana configured
 ```
-Http доступ к web интерфейсу grafana (http://158.160.49.210:30001).
+Http доступ к web интерфейсу grafana (http://51.250.72.11:30001).
 ![11](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/11_grafana.png)  
 
 Деплоим приложение
+Переходим в папку nginx и запускаем dep-my-nginx.yml
 ```
-$ kubectl apply -f dep-my-nginx.yml    
+$ kubectl apply -f nginx_deployment.yml    
 namespace/netology created
 deployment.apps/my-app created
 service/nginx-my created

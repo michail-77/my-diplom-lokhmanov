@@ -1,10 +1,10 @@
 resource "local_file" "ansible_inventory" {
-  filename = "/mnt/d/Netology/Diplom/my-diplom-lokhmanov/02_kubernetes/kubespray/inventory/mycluster/hosts.yml"
+  filename = "/mnt/d/Netology/Diplom/my-diplom-lokhmanov/02_kubernetes/hosts.yml"
   content  = <<EOF
 all:
   hosts:
     master:
-      ansible_host: ${yandex_compute_instance.master.network_interface.0.ip_address}
+      ansible_host: ${yandex_compute_instance.master.network_interface.0.nat_ip_address}
       ip: ${yandex_compute_instance.master.network_interface.0.ip_address}
       access_ip: ${yandex_compute_instance.master.network_interface.0.ip_address}
       ansible_user: ubuntu
