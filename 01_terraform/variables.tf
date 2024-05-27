@@ -80,3 +80,37 @@ variable "public_resources_node" {
   }
 }
 
+variable "instance_names" {
+  type    = list
+  default = ["node1", "node2"]
+}
+
+variable "cluster_size" {
+  description = "Number of nodes in the cluster"
+  default     = 4
+}
+
+
+
+# variable "node_count" {
+#   description = "Количество нод в кластере"
+#   type        = number
+#   default     = 4
+# }
+
+# # Определение переменных
+# variable "instance_count" {
+#   description = "Количество экземпляров для создания"
+#   type        = number
+# }
+
+# variable "instance_names" {
+#   description = "Список имен экземпляров"
+#   type        = list(string)
+# }
+
+# variable "cluster_size" {
+#   description = "Number of nodes in the cluster"
+#   type        = number
+#   default     = 4
+# }

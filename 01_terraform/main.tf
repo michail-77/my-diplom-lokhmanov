@@ -57,46 +57,18 @@ resource "yandex_compute_instance" "master" {
   }
 }
 
-# Node1 VM
-resource "yandex_compute_instance" "node1" {
-  name                      = local.instance_node1
-  hostname                  = local.instance_node1
-  zone                      = var.default_zone_b
-  allow_stopping_for_update = true
-
-  platform_id = "standard-v2"
-  resources {
-    cores         = var.public_resources_node.cores
-    memory        = var.public_resources_node.memory
-    core_fraction = var.public_resources_node.core_fraction
-  }
-
-  boot_disk {
-    initialize_params {
-      image_id = var.public_image
-      size     = var.public_resources_node.size
-    }
-  }
-
-  scheduling_policy {
-    preemptible = true
-  }
-
-  network_interface {
-    subnet_id  = yandex_vpc_subnet.subnet["central1-b"].id
-    nat        = true
-    ip_address = "10.0.2.11"
-  }
-
-  metadata = {
-    ssh-keys = "ubuntu:${file(var.ssh_public_key_path)}"
-  }
+module "instance" {
+  source = "./modules/instance"
+  cluster_size = var.cluster_size
 }
-# Node2 VM
-resource "yandex_compute_instance" "node2" {
-  name                      = local.instance_node2
-  hostname                  = local.instance_node2
-  zone                      = var.default_zone_d
+
+
+resource "yandex_compute_instance" "nodes" {
+  count = length(var.instance_names)
+
+  name                      = local.instance_names[count.index]
+  hostname                  = local.instance_names[count.index]
+  zone                      = var.default_zones[count.index]
   allow_stopping_for_update = true
 
   platform_id = "standard-v2"
@@ -118,12 +90,90 @@ resource "yandex_compute_instance" "node2" {
   }
 
   network_interface {
-    subnet_id  = yandex_vpc_subnet.subnet["central1-d"].id
+    subnet_id  = yandex_vpc_subnet.subnet["central1-${var.zones[count.index]}"].id
     nat        = true
-    ip_address = "10.0.3.12"
+    ip_address = "10.0.${count.index + 2}.${count.index + 10}"
   }
 
   metadata = {
     ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   }
 }
+
+
+# # Node1 VM
+# resource "yandex_compute_instance" "node1" {
+#   name                      = local.instance_node1
+#   hostname                  = local.instance_node1
+#   zone                      = var.default_zone_b
+#   allow_stopping_for_update = true
+
+#   platform_id = "standard-v2"
+#   resources {
+#     cores         = var.public_resources_node.cores
+#     memory        = var.public_resources_node.memory
+#     core_fraction = var.public_resources_node.core_fraction
+#   }
+
+#   boot_disk {
+#     initialize_params {
+#       image_id = var.public_image
+#       size     = var.public_resources_node.size
+#     }
+#   }
+
+#   scheduling_policy {
+#     preemptible = true
+#   }
+
+#   network_interface {
+#     subnet_id  = yandex_vpc_subnet.subnet["central1-b"].id
+#     nat        = true
+#     ip_address = "10.0.2.11"
+#   }
+
+#   metadata = {
+#     ssh-keys = "ubuntu:${file(var.ssh_public_key_path)}"
+#   }
+# }
+# # Node2 VM
+# resource "yandex_compute_instance" "node2" {
+#   name                      = local.instance_node2
+#   hostname                  = local.instance_node2
+#   zone                      = var.default_zone_d
+#   allow_stopping_for_update = true
+
+#   platform_id = "standard-v2"
+#   resources {
+#     cores         = var.public_resources_node.cores
+#     memory        = var.public_resources_node.memory
+#     core_fraction = var.public_resources_node.core_fraction
+#   }
+
+#   boot_disk {
+#     initialize_params {
+#       image_id = var.public_image
+#       size     = var.public_resources_node.size
+#     }
+#   }
+
+#   scheduling_policy {
+#     preemptible = true
+#   }
+
+#   network_interface {
+#     subnet_id  = yandex_vpc_subnet.subnet["central1-d"].id
+#     nat        = true
+#     ip_address = "10.0.3.12"
+#   }
+
+#   metadata = {
+#     ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+#   }
+# }
+
+# module "yandex_cluster" {
+#   source = "./modules/yandex-cluster"
+#   cluster_size = var.cluster_size
+# }
+
