@@ -61,9 +61,9 @@ resource "yandex_compute_instance" "master" {
 resource "yandex_compute_instance" "nodes" {
   for_each = local.nodes
 
-  name                     = each.key
-  hostname                 = each.key
-  zone                     = each.value.zone
+  name                      = each.key
+  hostname                  = each.key
+  zone                      = each.value.zone
   allow_stopping_for_update = true
 
   platform_id = "standard-v2"
