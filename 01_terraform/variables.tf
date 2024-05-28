@@ -1,8 +1,3 @@
-# variable "token" {
-#   type        = string
-#   description = "Yandex.Cloud API token"
-# }
-
 variable "service_account_key_file" {
   type        = string
   description = "Yandex.Cloud service account key file"
@@ -80,37 +75,21 @@ variable "public_resources_node" {
   }
 }
 
-variable "instance_names" {
-  type    = list
-  default = ["node1", "node2"]
+# Определение списка нод
+locals {
+  nodes = {
+    "node1" = {
+      zone      = var.default_zone_b
+      subnet_id = "central1-b"
+      ip_offset = 2
+      ssh_key   = var.ssh_public_key_path
+    },
+    "node2" = {
+      zone      = var.default_zone_d
+      subnet_id = "central1-d"
+      ip_offset = 3
+      ssh_key   = var.ssh_public_key_path
+    }
+  }
 }
 
-variable "cluster_size" {
-  description = "Number of nodes in the cluster"
-  default     = 4
-}
-
-
-
-# variable "node_count" {
-#   description = "Количество нод в кластере"
-#   type        = number
-#   default     = 4
-# }
-
-# # Определение переменных
-# variable "instance_count" {
-#   description = "Количество экземпляров для создания"
-#   type        = number
-# }
-
-# variable "instance_names" {
-#   description = "Список имен экземпляров"
-#   type        = list(string)
-# }
-
-# variable "cluster_size" {
-#   description = "Number of nodes in the cluster"
-#   type        = number
-#   default     = 4
-# }

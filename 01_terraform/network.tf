@@ -1,5 +1,3 @@
-# network.tf
-
 # Определение сети VPC
 resource "yandex_vpc_network" "develop" {
   name = var.vpc_name
@@ -30,4 +28,3 @@ resource "yandex_vpc_subnet" "subnet" {
   network_id     = yandex_vpc_network.develop.id
   v4_cidr_blocks = [each.value.cidr_block]
 }
-
