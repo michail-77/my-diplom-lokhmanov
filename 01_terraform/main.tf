@@ -177,3 +177,72 @@ resource "yandex_compute_instance" "nodes" {
 #   cluster_size = var.cluster_size
 # }
 
+
+
+# Создаем переменную с количеством нод в кластере
+variable "cluster_size" {
+  default = 3
+}
+
+# Создаем список имен для нод
+variable "node_names" {
+  default = ["node1", "node2", "node3"]
+}
+
+# Создаем список зон для нод
+variable "node_zones" {
+  default = ["var.default_zone_b", "var.default_zone_c", "var.default_zone_d"]
+}
+
+# Создаем список IP адресов для нод
+variable "node_ips" {
+  default = ["10.0.2.11", "10.0.2.12", "10.0.2.13"]
+}
+
+# Создаем переменную с общими ресурсами для нод
+variable "public_resources_node" {
+  default = {
+    cores         = 2
+    memory        = 4
+    core_fraction = 100
+    size          = 20
+  }
+}
+
+# Создаем ресурсы yandex_compute_instance с использованием цикла
+resource "yandex_compute_instance" "nodes" {
+  count = var.cluster_size
+
+  name                      = var.node_names[count.index]
+  hostname                  = var.node_names[count.index]
+  zone                      = var.node_zones[count.index]
+  allow_stopping_for_update = true
+
+  platform_id = "standard-v2"
+  resources {
+    cores         = var.public_resources_node.cores
+    memory        = var.public_resources_node.memory
+    core_fraction = var.public_resources_node.core_fraction
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = var.public_image
+      size     = var.public_resources_node.size
+    }
+  }
+
+  scheduling_policy {
+    preemptible = true
+  }
+
+  network_interface {
+    subnet_id  = yandex_vpc_subnet.subnet["central1-b"].id
+    nat        = true
+    ip_address = var.node_ips[count.index]
+  }
+
+  metadata = {
+    ssh-keys = "ubuntu:${file(var.ssh_public_key_path)}"
+  }
+}
