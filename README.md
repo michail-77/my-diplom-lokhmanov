@@ -407,7 +407,10 @@ CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.gi
 
 Для работы ci-cd в github action требуются некоторые учетные данные.
 Поэтому создаем в Dockerhub секретный токен.  
-![]()
+![18](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/18_docker_token.png)  
+Затем создаем в github секреты для доступа к DockerHub.  
+![17](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/17_github_secrets.png)
+Создаем в корне проекта 
 
 
 
