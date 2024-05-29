@@ -399,14 +399,15 @@ my-app-7b4b84c86-prpk5   1/1     Running   0          82s
 ### Решение. 
 ```
 Разбираюсь и пытаюсь доделать.(
-и если не затруднит, не могли бы помочь... или немного подождать, я за выходные постараюсь доделать.
+
 ```  
 
 Для автоматической сборки docker image и деплоя приложения при изменении кода буду использовать [Github actions](https://docs.github.com/ru/actions)  
 CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)  
 
-Настраивал по данной статье https://nicwortel.nl/blog/2022/continuous-deployment-to-kubernetes-with-github-actions , но что-то не получается с автоизацией разобраться.
-![12](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/12_cicd.png)
+Для работы ci-cd в github action требуются некоторые учетные данные.
+Поэтому создаем в Dockerhub секретный токен.  
+![]()
 
 
 
