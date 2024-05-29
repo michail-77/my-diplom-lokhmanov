@@ -410,7 +410,8 @@ CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.gi
 ![18](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/18_docker_token.png)  
 Затем создаем в github секреты для доступа к DockerHub.  
 ![17](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/17_github_secrets.png)
-Создаем в корне проекта 
+Рабочие процессы GitHub Actions определяем в файлах YAML в .github/workflows каталоге репозитория nginx.
+[ci-cd.yaml](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)
 
 
 
