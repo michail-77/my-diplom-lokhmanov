@@ -413,6 +413,12 @@ CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.gi
 Рабочие процессы GitHub Actions определяем в файлах YAML в .github/workflows каталоге репозитория nginx.
 [ci-cd.yaml](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)
 
+При любом коммите в репозиторие с тестовым приложением происходит сборка и отправка в регистр Docker образа.
+![13](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/13_ci_github_action.png)  
+![14](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/14_ci_dockerhub.png)  
+![16](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/16_ci_github_action.png)  
+![15](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/15_ci_dockerhub.png)  
+
 
 
 ---
