@@ -56,7 +56,7 @@ variable "public_resources" {
     cores         = 4
     memory        = 4
     core_fraction = 20
-    size          = 40
+    size          = 50
   }
 }
 
