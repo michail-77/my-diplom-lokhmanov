@@ -397,22 +397,21 @@ my-app-7b4b84c86-prpk5   1/1     Running   0          82s
 
 ### Решение. 
 ```
-Разбираюсь и пытаюсь доделать.(
 
 ```  
 
 Для автоматической сборки docker image и деплоя приложения при изменении кода буду использовать [Github actions](https://docs.github.com/ru/actions)  
 CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)  
 
-Для работы ci-cd в github action требуются некоторые учетные данные.
-Поэтому создаем в Dockerhub секретный токен.  
-![18](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/18_docker_token.png)  
+Для работы ci-cd в github action требуются некоторые учетные данные.  
+Поэтому создаем в Dockerhub секретный токен.   
+![18](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/18_docker_token.png)   
 Затем создаем в github секреты для доступа к DockerHub.  
-![17](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/17_github_secrets.png)
-Рабочие процессы GitHub Actions определяем в файлах YAML в .github/workflows каталоге репозитория nginx.
-[ci-cd.yaml](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)
+![17](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/17_github_secrets.png)  
+Рабочие процессы GitHub Actions определяем в файлах YAML в .github/workflows каталоге репозитория nginx.  
+[ci-cd.yaml](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)  
 
-При любом коммите в репозиторие с тестовым приложением происходит сборка и отправка в регистр Docker образа.
+При любом коммите в репозиторие с тестовым приложением происходит сборка и отправка в регистр Docker образа.  
 ![13](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/13_ci_github_action.png)  
 ![14](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/14_ci_dockerhub.png)  
 ![16](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/16_ci_github_action.png)  
