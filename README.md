@@ -247,7 +247,7 @@ if you run "terraform apply" now.
 ### Решение:  
 1. a. На предыдущем шаге мы подготовили инфраструктуру для разворачивания kubernetes кластера и файл [hosts.yml](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/02_kubernetes/hosts.yml).  
    б. Будем использовать [Kubespray](https://kubernetes.io/docs/setup/production-environment/tools/kubespray/).  
-      Для этого клонируем репозиторий [Kubespray](https://github.com/kubernetes-sigs/kubespray) к себе.
+      Для этого клонируем репозиторий [Kubespray](https://github.com/kubernetes-sigs/kubespray) к себе и перейдем в него.
       Установим зависимости:
 ```
 $ ansible-galaxy install -r requirements.yml
