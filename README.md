@@ -56,7 +56,7 @@
 2. Полученная конфигурация инфраструктуры является предварительной, поэтому в ходе дальнейшего выполнения задания возможны изменения.
 
 ### Решение:  
-1. Создаем сервисный аккаунт в [yandex cloud] (https://yandex.cloud/ru/docs/iam/operations/sa/create) согласно инструкции и назначаем ему роли.
+1. Создаем сервисный аккаунт editor в [yandex cloud] (https://yandex.cloud/ru/docs/iam/operations/sa/create) согласно инструкции и назначаем ему роли.
 ```
    $ yc iam service-account list
 +----------------------+-----------+
@@ -64,7 +64,6 @@
 +----------------------+-----------+
 | ajec47hqj2hk2peqj980 | admin     |
 | ajeetedg476jfgrmn6mn | editor    |
-| ajeupl64gvqlbfab689f | bucket-sa |
 +----------------------+-----------+
 ```
    ![6](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/6_service%20account.png)
