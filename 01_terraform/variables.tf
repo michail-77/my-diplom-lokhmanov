@@ -46,7 +46,7 @@ variable "vpc_name" {
 
 variable "public_image" {
   type        = string
-  default     = "fd852pbtueis1q0pbt4o"
+  default     = "fd8re3hiqnikqr7j7m8s"
   description = "Yandex.Compute image ID"
 }
 
