@@ -364,7 +364,7 @@ Http доступ к web интерфейсу grafana (http://51.250.72.11:30001
 ![11](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/11_grafana.png)  
 
 Деплоим приложение
-Переходим в папку nginx и запускаем dep-my-nginx.yml
+Переходим в папку nginx и запускаем nginx_deployment.yml 
 ```
 $ kubectl apply -f nginx_deployment.yml    
 namespace/netology created
