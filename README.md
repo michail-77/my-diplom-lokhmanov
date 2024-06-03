@@ -417,6 +417,8 @@ CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.gi
 ![16](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/16_ci_github_action.png)  
 ![15](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/15_ci_dockerhub.png)  
 
+![]
+
 
 
 ---
