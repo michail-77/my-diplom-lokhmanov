@@ -1,34 +1,51 @@
-# файл должен лежать в корне проекта .github/workflows/ci-cd.yaml
 name: node_app
 
-on: # specify the build to trigger the automated ci/cd
-    push:
-        branches:
-            - "main"
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_TAG: michail77/image-nginx:latest
+  RELEASE_NAME: nginx-release
+  NAMESPACE: netology
 
 jobs:
-    build:
-        name: Build Docker image
-        runs-on: ubuntu-latest # specify the build machine
-        steps:
-            - # checkout to the repository on the build machine
-                name: Checkout
-                uses: actions/checkout@v3
-            - # login to Docker Hub using the secrets provided
-                name: Login to Docker Hub
-                uses: docker/login-action@v2
-                with:
-                  username: ${{ secrets.DOCKERHUB_USERNAME }}
-                  password: ${{ secrets.DOCKERHUB_TOKEN }}
-            - # create a build kit builder instance
-                name: Set up Docker Buildx
-                uses: docker/setup-buildx-action@v2
-            - # build the container image and push it to Docker \
-                # Hub with the name image-nginx.
-                name: Build and push
-                uses: docker/build-push-action@v4
-                with:
-                  context: .
-                  file: ./Dockerfile
-                  push: true
-                  tags: michail77/image-nginx:gittag
+  build-and-push:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_TAG }}
+
+  deploy:
+    needs: build-and-push
+    name: Deploy to Kubernetes
+    if: startsWith(github.event.head_commit.message, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure Kubernetes CLI
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+      - name: Deploy to Kubernetes with Helm
+        run: |
+          helm upgrade nginx ./nginx-1.0.0.tgz
