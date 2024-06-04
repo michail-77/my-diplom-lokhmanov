@@ -417,6 +417,7 @@ CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.gi
 
 Если коммит начинается с v*, то приложение собирается, отправляется в docker hub и ставиться в кластер.  
 В противном случае только отправляется в docker hub.  
+[Helm chart](https://github.com/michail-77/nginx/tree/main/nginx_ci)  
 
 ![21](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/21_ci.png)
 ![22](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/22_ci.png)
