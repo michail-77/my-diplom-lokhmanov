@@ -396,9 +396,7 @@ my-app-7b4b84c86-prpk5   1/1     Running   0          82s
 3. При создании тега (например, v1.0.0) происходит сборка и отправка с соответствующим label в регистри, а также деплой соответствующего Docker образа в кластер Kubernetes.
 
 ### Решение. 
-```
 
-```  
 
 Для автоматической сборки docker image и деплоя приложения при изменении кода буду использовать [Github actions](https://docs.github.com/ru/actions)  
 CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.github/workflows/ci-cd.yaml)  
