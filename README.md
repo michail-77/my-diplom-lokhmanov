@@ -332,10 +332,10 @@ users:
 ### Решение:  
 Развернём систему мониторинга с помощью Kube-Prometheus.  
 Зайдёт на Master и склонируем репозиторий:  
-#git clone https://github.com/prometheus-operator/kube-prometheus.git  
-Переходим в каталог с kube-prometheus и развертываем контейнеры:  
- $sudo kubectl apply --server-side -f manifests/setup  
- $sudo kubectl apply -f manifests/  
+#git clone https://github.com/prometheus-operator/kube-prometheus.git   
+Переходим в каталог с kube-prometheus и развертываем контейнеры:   
+ $sudo kubectl apply --server-side -f manifests/setup   
+ $sudo kubectl apply -f manifests/   
 ```
 ubuntu@master:~/kube-prometheus$ sudo kubectl get po -n monitoring -o wide
 NAME                                   READY   STATUS    RESTARTS        AGE     IP               NODE     NOMINATED NODE   READINESS GATES
