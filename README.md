@@ -423,23 +423,7 @@ CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.gi
 ![22](https://github.com/michail-77/my-diplom-lokhmanov/blob/main/image/22_ci.png)
 
 
-```
-user@DESKTOP-RAJIAFA:/mnt/d/Netology/Diplom/nginx$ kubectl apply -f dep-my-nginx.yml
-deployment.apps/my-app unchanged
-service/my-app configured
 
-user@DESKTOP-RAJIAFA:/mnt/d/Netology/Diplom/nginx$ helm package nginx_ci
-Successfully packaged chart and saved it to: /mnt/d/Netology/Diplom/nginx/nginx-1.0.0.tgz
-
-user@DESKTOP-RAJIAFA:/mnt/d/Netology/Diplom/nginx$ helm upgrade nginx ./nginx-1.0.0.tgz
-Release "nginx" has been upgraded. Happy Helming!
-NAME: nginx
-LAST DEPLOYED: Tue Jun  4 13:44:24 2024
-NAMESPACE: default
-STATUS: deployed
-REVISION: 18
-TEST SUITE: None
-```  
 
 
 
