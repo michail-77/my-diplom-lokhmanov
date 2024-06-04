@@ -425,9 +425,6 @@ CI-CD.yaml лежит [тут](https://github.com/michail-77/nginx/blob/main/.gi
 
 
 
-
-
-
 ---
 ## Что необходимо для сдачи задания?
 
